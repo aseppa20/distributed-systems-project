@@ -2,6 +2,8 @@ import inotify.adapters, inotify.constants
 import paramiko
 import getpass
 import time
+import glob
+import os
 
 def send_file_to_cache(user: str, host: str, file):
     connection = paramiko.SSHClient()
@@ -29,14 +31,39 @@ def check_sync(user: str, host: str):
     connection = paramiko.SSHClient()
     connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     connection.connect(host, 22, user, "1234")
+    sftp = connection.open_sftp()
+    files = sftp.listdir()
+    for file in files:
+        if file[0] == ".":
+            continue
+        try:
+            filestat = sftp.stat(file)
+            lfile = os.stat(f"/home/{user}/{file}").st_mtime
+            rfile = filestat.st_mtime
+            if rfile == None:
+                rfile = 0
+            if lfile < rfile:
+                sftp.get(file, f"/home/{user}/{file}")
+            elif lfile.as_integer_ratio() == rfile.as_integer_ratio():
+                continue
+            else:
+                send_file_to_cache(user, host, f"/home/{user}/{file}")
+        except FileNotFoundError:
+            sftp.get(file, f"/home/{user}/{file}")
+        except IsADirectoryError:
+            pass
+    
+    connection.close()
     
 
 def main():
     user = getpass.getuser()
     host = "192.168.124.251"
+    follow_folder = f"/home/{user}"
+    check_sync(user, host)
     follower = inotify.adapters.Inotify()
 
-    follower.add_watch(f"/home/{user}")
+    follower.add_watch(follow_folder)
 
     while True:
         for event in follower.event_gen(yield_nones=False):
