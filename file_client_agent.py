@@ -2,16 +2,26 @@ import inotify.adapters, inotify.constants
 import paramiko
 import getpass
 import time
-import glob
 import os
 
-def send_file_to_cache(user: str, host: str, file):
+def send_file_to_cache(user: str, host: str, file: str, check_timestamp: bool = False):
     connection = paramiko.SSHClient()
     connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     connection.connect(host, 22, user, "1234")
     sftp = connection.open_sftp()
     try:
-        sftp.put(file, file)
+        if check_timestamp:
+            filestat = sftp.stat(file)
+            lfile = os.stat(f"/home/{user}/{file}").st_mtime
+            rfile = filestat.st_mtime
+            if rfile == None:
+                rfile = 0
+            if int(lfile) > rfile:
+                sftp.put(file, file)
+                connection.exec_command(f"chmod -x {file}")
+        else:
+            sftp.put(file, file)
+            connection.exec_command(f"chmod -x {file}")
     except FileNotFoundError:
         # Temp files might be deleted before sent, so skipping any not found files
         pass
@@ -42,9 +52,9 @@ def check_sync(user: str, host: str):
             rfile = filestat.st_mtime
             if rfile == None:
                 rfile = 0
-            if lfile < rfile:
+            if int(lfile) < rfile:
                 sftp.get(file, f"/home/{user}/{file}")
-            elif lfile.as_integer_ratio() == rfile.as_integer_ratio():
+            elif int(lfile) == rfile:
                 continue
             else:
                 send_file_to_cache(user, host, f"/home/{user}/{file}")
