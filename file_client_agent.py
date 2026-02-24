@@ -59,8 +59,9 @@ def check_sync(user: str, host: str):
 def main():
     user = getpass.getuser()
     host = "192.168.124.251"
+    fs_host = "192.168.124.251"
     follow_folder = f"/home/{user}"
-    check_sync(user, host)
+    check_sync(user, fs_host)
     follower = inotify.adapters.Inotify()
 
     follower.add_watch(follow_folder)

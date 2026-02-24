@@ -1,0 +1,13 @@
+[Unit]
+Description=Distributed systems course POC process for file client agent.
+After=system.login
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=$USER
+ExecStart=/usr/bin/env python3 /var/dspoc/file_client_agent.py
+
+[Install]
+WantedBy=multi-user.target
