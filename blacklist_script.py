@@ -30,10 +30,12 @@ def block_ip(agent_ip, cache_host, cache_user):
 
         write_debug_file("SSH CONNECTION", str(connection.__getstate__))
 
-        #TODO: will test that this works later, starting testing with adding to blacklist file
-        cmd_block = f"sudo iptables -I INPUT -s {agent_ip} -p tcp,udp -m tcp,udp --dport 22 -m comment --comment 'Wazuh blocked {agent_ip} from using SSH to login' -j DROP"
-        #connection.exec_command(cmd_block)
+        #starting testing with adding to blacklist file
         connection.exec_command(f"echo '{agent_ip}' >> /home/wazuh/blacklist")
+
+        #Ip blocking
+        cmd_block = f"sudo iptables -I INPUT -s {agent_ip} -p tcp,udp -m tcp,udp --dport 22 -m comment --comment 'Wazuh blocked {agent_ip} from using SSH to login' -j DROP"
+        connection.exec_command(cmd_block)
 
         # Log action locally
         write_debug_file("MAIN ACTION", f"IP {agent_ip} blocked on: {cache_host}")
