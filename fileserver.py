@@ -20,7 +20,6 @@ shortpath = "/home/" + fileserver
 userList  = []
 blackList = []
 blackListreference = {}
-blackListUser = ''
 blackListIP = []
 timeToReset = int(30) 
 #TO IMPROVE TESTING AND READING TERMINAL
@@ -37,6 +36,8 @@ username  = ""
 passkey = ""
 #NEXT ONE WILL BE IP
 cache = ""
+#ADD USERNAME FOR THE USER TO BE BLOCKED IN DEMO
+blackListUser = ''
 
 
 
@@ -218,6 +219,7 @@ else:
     
     
    
+
 
 
 
