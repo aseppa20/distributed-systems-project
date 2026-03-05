@@ -190,7 +190,7 @@ def syncFiles()-> None:
 
 def main() -> None:
     while True:
-        connectCache(cache, fileserver)
+        connectCache(cache, username)
         print(userList)
         syncFiles()
         print("ready to sleep")
@@ -216,6 +216,7 @@ else:
     
     
    
+
 
 
 
