@@ -10,7 +10,7 @@ import paramiko
 
 # Fill in cache/file server info
 CACHE_HOST = "192.168.0.19"  # Replace with file server IP
-CACHE_USER = "lemon"       # Replace with SSH user on file server
+CACHE_USER = "user"       # Replace with SSH user on file server
 LOG_FILE = "/var/ossec/logs/active-responses.log"
 
 def write_debug_file(ar_name, msg):
@@ -26,7 +26,7 @@ def block_ip(agent_ip, cache_host, cache_user):
         connection = paramiko.SSHClient()
         connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # Using password here for simplicity; should be replaced with key
-        connection.connect(cache_host, 22, cache_user, "debian")
+        connection.connect(cache_host, 22, cache_user, "password")
 
         write_debug_file("SSH CONNECTION", str(connection.__getstate__))
 
