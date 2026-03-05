@@ -19,8 +19,6 @@ homepath = "/home/" + fileserver + "/backups/"
 shortpath = "/home/" + fileserver
 userList  = []
 blackList = []
-blackListreference = {}
-blackListIP = []
 timeToReset = int(30) 
 #TO IMPROVE TESTING AND READING TERMINAL
 basicWait = int(3)
@@ -36,8 +34,6 @@ username  = ""
 passkey = ""
 #NEXT ONE WILL BE IP
 cache = ""
-#ADD USERNAME FOR THE USER TO BE BLOCKED IN DEMO
-blackListUser = ''
 
 
 
@@ -84,15 +80,14 @@ def  connectCache(host : str, user : str):
 
 
 def initializeBlacklist() -> None:
+        blackList.clear()
         if not os.path.exists('/home/wazuh/blacklist'):
             return
-        with open('/home/wazuh/blacklist', 'r') as f:
+        with open(shortpath + '/blackListUsers', 'r') as f:
             for line in f.readlines():
-                ip = line.strip()
-                if ip not in blackListIP:
-                    blackListIP.append(ip)
-        if  blackListUser not in blackList:
-            blackList.append(blackListUser)
+                user = line.strip()
+                if user not in blackList:
+                    blackList.append(user)
 
 
 def getCachedCommands(user: str) -> None:
@@ -212,6 +207,8 @@ def main() -> None:
 
 if __name__ == "__main__":
     installer()
+    call('mkdir -p /home/wazuh; cd /home/wazuh ; touch blacklist', shell = True)
+    call('touch ' + shortpath + '/blackListUsers', shell = True)
     main()
 else: 
     pass
@@ -219,6 +216,7 @@ else:
     
     
    
+
 
 
 
